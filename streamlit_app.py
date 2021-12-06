@@ -1,8 +1,13 @@
+from io import BytesIO
+import PIL.Image
 from collections import namedtuple
 import altair as alt
 import math
 import pandas as pd
+import numpy as np
 import streamlit as st
+import urllib
+import cv2
 
 """
 # Welcome to Streamlit!
@@ -15,24 +20,46 @@ forums](https://discuss.streamlit.io).
 In the meantime, below is an example of what you can do with just a few lines of code:
 """
 
+def write_image(dg, arr):
+    arr = np.uint8(np.clip(arr/255.0, 0, 1)*255)
+    dg.image(arr, use_column_width=True)
+    return dg
+
+
+@st.cache()
+def read_file_from_url(url):
+    return urllib.request.urlopen(url).read()
+
+
+MAX_IMG_WIDTH = 600
+MAX_IMG_HEIGHT = 400
+DEFAULT_IMAGE_URL = 'https://upload.wikimedia.org/wikipedia/commons/5/59/Brama_G%C5%82%C3%B3wna_kampus_centralny_Uniwersytetu_Warszawskiego_2019.jpg'
+
+
+file_obj = st.sidebar.file_uploader('Choose an image:', ('jpg', 'jpeg'))
+
+if not file_obj:
+    file_obj = BytesIO(read_file_from_url(DEFAULT_IMAGE_URL))
+
+img_in = PIL.Image.open(file_obj)
+
+img_in.thumbnail((MAX_IMG_WIDTH, MAX_IMG_HEIGHT), PIL.Image.ANTIALIAS)
+img_in = np.float32(img_in)
+
+rows,cols,channels = img_in.shape
+
+M00 = st.sidebar.slider("M00", 0., 3., 1.)
+M01 = st.sidebar.slider("M01", 0., 3., 0.)
+M02 = st.sidebar.slider("M02", 0, 200, 0)
+
+M10 = st.sidebar.slider("M10", 0., 3., 0.)
+M11 = st.sidebar.slider("M11", 0., 3., 1.)
+M12 = st.sidebar.slider("M12", 0, 200, 0)
 
 with st.echo(code_location='below'):
-    total_points = st.slider("Number of points in spiral", 1, 5000, 2000)
-    num_turns = st.slider("Number of turns in spiral", 1, 100, 9)
+    M = np.float32([[M00, M01, M02],[M10, M11, M12]])
+    dst = cv2.warpAffine(img_in,M,(cols,rows))
 
-    Point = namedtuple('Point', 'x y')
-    data = []
-
-    points_per_turn = total_points / num_turns
-
-    for curr_point_num in range(total_points):
-        curr_turn, i = divmod(curr_point_num, points_per_turn)
-        angle = (curr_turn + 1) * 2 * math.pi * i / points_per_turn
-        radius = curr_point_num / total_points
-        x = radius * math.cos(angle)
-        y = radius * math.sin(angle)
-        data.append(Point(x, y))
-
-    st.altair_chart(alt.Chart(pd.DataFrame(data), height=500, width=500)
-        .mark_circle(color='#0068c9', opacity=0.5)
-        .encode(x='x:Q', y='y:Q'))
+st.write(M)
+write_image(st, img_in)
+write_image(st, dst)
