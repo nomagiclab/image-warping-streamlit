@@ -12,12 +12,7 @@ import cv2
 """
 # Welcome to Streamlit!
 
-Edit `/streamlit_app.py` to customize this app to your heart's desire :heart:
-
-If you have any questions, checkout our [documentation](https://docs.streamlit.io) and [community
-forums](https://discuss.streamlit.io).
-
-In the meantime, below is an example of what you can do with just a few lines of code:
+Use the sliders to modify the entries in a 2x3 matrix that defines an [affine transform in opencv](https://docs.opencv.org/3.4/d4/d61/tutorial_warp_affine.html) (which preserves lines parallelism).
 """
 
 def write_image(dg, arr):
