@@ -48,13 +48,13 @@ img_in = np.float32(img_in)
 
 rows,cols,channels = img_in.shape
 
-M00 = st.sidebar.slider("M00", 0., 3., 1.)
-M01 = st.sidebar.slider("M01", 0., 3., 0.)
-M02 = st.sidebar.slider("M02", 0, 200, 0)
+M00 = st.sidebar.slider("M00", -2.0, 2., 1.)
+M01 = st.sidebar.slider("M01", -2.0, 2., 0.)
+M02 = st.sidebar.slider("M02", -100, 100, 0)
 
-M10 = st.sidebar.slider("M10", 0., 3., 0.)
-M11 = st.sidebar.slider("M11", 0., 3., 1.)
-M12 = st.sidebar.slider("M12", 0, 200, 0)
+M10 = st.sidebar.slider("M10", -2.0, 2., 0.)
+M11 = st.sidebar.slider("M11", -2.0, 2., 1.)
+M12 = st.sidebar.slider("M12", -100, 100, 0)
 
 with st.echo(code_location='below'):
     M = np.float32([[M00, M01, M02],[M10, M11, M12]])
