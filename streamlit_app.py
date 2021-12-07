@@ -34,8 +34,9 @@ def read_file_from_url(url):
 
 file_obj = st.sidebar.file_uploader('Choose an image:', ('jpg', 'jpeg'))
 
-with open(FILE_PATH, 'rb') as f:
-    file_obj = BytesIO(f.read())
+if not file_obj:
+    with open(FILE_PATH, 'rb') as f:
+        file_obj = BytesIO(f.read())
 
 if not file_obj:
     file_obj = BytesIO(read_file_from_url(DEFAULT_IMAGE_URL))
